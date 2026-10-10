@@ -46,5 +46,5 @@ jobs:
           OVH_PASSWORD: ${{ secrets.OVH_PASSWORD }}
         run: |
           lftp -u "$OVH_USERNAME","$OVH_PASSWORD" "sftp://$OVH_HOST:22" \
-            -e "set sftp:auto-confirm yes; mirror -R dist/ /www/; bye"
+            -e "set sftp:auto-confirm yes; mirror -R dist/ www/; bye"
 
