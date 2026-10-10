@@ -33,14 +33,18 @@ jobs:
       - name: Verify build
         run: test -f dist/index.html
 
-      - name: Deploy to OVHcloud
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.OVH_HOST }}
-          username: ${{ secrets.OVH_USERNAME }}
-          password: ${{ secrets.OVH_PASSWORD }}
-          port: 22
-          source: "dist/*"
-          target: "/home/novesqm/www"
-          strip_components: 1
-          overwrite: true
+
+      - name: Install SFTP client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y lftp
+
+      - name: Deploy to OVHcloud via SFTP
+        env:
+          OVH_HOST: ${{ secrets.OVH_HOST }}
+          OVH_USERNAME: ${{ secrets.OVH_USERNAME }}
+          OVH_PASSWORD: ${{ secrets.OVH_PASSWORD }}
+        run: |
+          lftp -u "$OVH_USERNAME","$OVH_PASSWORD" "sftp://$OVH_HOST:22" \
+            -e "set sftp:auto-confirm yes; mirror -R dist/ /www/; bye"
+
